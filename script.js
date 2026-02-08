@@ -32,7 +32,6 @@ function validateConfig() {
         config.animations.heartExplosionSize = 1.5;
     }
 
-    // Log warnings if any
     if (warnings.length > 0) {
         console.warn("⚠️ Configuration Warnings:");
         warnings.forEach(warning => console.warn("- " + warning));
@@ -51,38 +50,75 @@ function getDefaultColor(key) {
     return defaults[key];
 }
 
+// Apply CSS variables directly here so you do not need theme.js
+function applyThemeFromConfig() {
+    const root = document.documentElement;
+    root.style.setProperty('--background-color-1', config.colors.backgroundStart);
+    root.style.setProperty('--background-color-2', config.colors.backgroundEnd);
+    root.style.setProperty('--button-color', config.colors.buttonBackground);
+    root.style.setProperty('--button-hover', config.colors.buttonHover);
+    root.style.setProperty('--text-color', config.colors.textColor);
+
+    root.style.setProperty('--float-duration', config.animations.floatDuration);
+    root.style.setProperty('--float-distance', config.animations.floatDistance);
+    root.style.setProperty('--bounce-speed', config.animations.bounceSpeed);
+    root.style.setProperty('--heart-explosion-size', config.animations.heartExplosionSize);
+}
+
 // Set page title
 document.title = config.pageTitle;
 
 // Initialize the page content when DOM is loaded
 window.addEventListener('DOMContentLoaded', () => {
-    // Validate configuration first
     validateConfig();
+    applyThemeFromConfig();
 
     // Set texts from config
-    document.getElementById('valentineTitle').textContent = `${config.valentineName}, my love...`;
-    
+    const titleEl = document.getElementById('valentineTitle');
+    if (titleEl) titleEl.textContent = `${config.valentineName}, my love...`;
+
     // Set first question texts
-    document.getElementById('question1Text').textContent = config.questions.first.text;
-    document.getElementById('yesBtn1').textContent = config.questions.first.yesBtn;
-    document.getElementById('noBtn1').textContent = config.questions.first.noBtn;
-    document.getElementById('secretAnswerBtn').textContent = config.questions.first.secretAnswer;
-    
+    const q1Text = document.getElementById('question1Text');
+    const yes1 = document.getElementById('yesBtn1');
+    const no1 = document.getElementById('noBtn1');
+    const secret = document.getElementById('secretAnswerBtn');
+
+    if (q1Text) q1Text.textContent = config.questions.first.text;
+    if (yes1) yes1.textContent = config.questions.first.yesBtn;
+    if (no1) no1.textContent = config.questions.first.noBtn;
+    if (secret) secret.textContent = config.questions.first.secretAnswer;
+
     // Set second question texts
-    document.getElementById('question2Text').textContent = config.questions.second.text;
-    document.getElementById('startText').textContent = config.questions.second.startText;
-    document.getElementById('nextBtn').textContent = config.questions.second.nextBtn;
-    
+    const q2Text = document.getElementById('question2Text');
+    const startText = document.getElementById('startText');
+    const nextBtn = document.getElementById('nextBtn');
+
+    if (q2Text) q2Text.textContent = config.questions.second.text;
+    if (startText) startText.textContent = config.questions.second.startText;
+    if (nextBtn) nextBtn.textContent = config.questions.second.nextBtn;
+
     // Set third question texts
-    document.getElementById('question3Text').textContent = config.questions.third.text;
-    document.getElementById('yesBtn3').textContent = config.questions.third.yesBtn;
-    document.getElementById('noBtn3').textContent = config.questions.third.noBtn;
+    const q3Text = document.getElementById('question3Text');
+    const yes3 = document.getElementById('yesBtn3');
+    const no3 = document.getElementById('noBtn3');
+
+    if (q3Text) q3Text.textContent = config.questions.third.text;
+    if (yes3) yes3.textContent = config.questions.third.yesBtn;
+    if (no3) no3.textContent = config.questions.third.noBtn;
 
     // Start the interactive background
     startInteractiveBackground();
 
-    // Setup music player
-    setupMusicPlayer();
+    // Love meter hookup
+    initLoveMeter();
+
+    // Close apology modal when clicking outside the box
+    const modal = document.getElementById('apologyModal');
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeApology();
+        });
+    }
 });
 
 // Interactive heart background
@@ -163,18 +199,15 @@ function drawBackground(state) {
     const repelRadius2 = repelRadius * repelRadius;
 
     for (const p of hearts) {
-        // Drift
         p.x += p.vx;
         p.y += p.vy;
         p.r += p.vr;
 
-        // Wrap
         if (p.x < -40) p.x = w + 40;
         if (p.x > w + 40) p.x = -40;
         if (p.y < -40) p.y = h + 40;
         if (p.y > h + 40) p.y = -40;
 
-        // Mouse interaction
         if (mouse.active) {
             const dx = p.x - mouse.x;
             const dy = p.y - mouse.y;
@@ -189,7 +222,6 @@ function drawBackground(state) {
             }
         }
 
-        // Soft damping
         p.vx *= 0.995;
         p.vy *= 0.995;
 
@@ -215,13 +247,14 @@ function drawHeart(ctx, x, y, size, rotation, alpha) {
     ctx.restore();
 }
 
-// Function to show next question
+// Show next question
 function showNextQuestion(questionNumber) {
     document.querySelectorAll('.question-section').forEach(q => q.classList.add('hidden'));
-    document.getElementById(`question${questionNumber}`).classList.remove('hidden');
+    const next = document.getElementById(`question${questionNumber}`);
+    if (next) next.classList.remove('hidden');
 }
 
-// Function to move the "No" button when clicked
+// Move button
 function moveButton(button) {
     const pad = 14;
     const x = pad + Math.random() * (window.innerWidth - button.offsetWidth - pad * 2);
@@ -231,61 +264,64 @@ function moveButton(button) {
     button.style.top = y + 'px';
 }
 
-// Love meter functionality
-const loveMeter = document.getElementById('loveMeter');
-const loveValue = document.getElementById('loveValue');
-const extraLove = document.getElementById('extraLove');
+// Love meter
+function initLoveMeter() {
+    const loveMeter = document.getElementById('loveMeter');
+    const loveValue = document.getElementById('loveValue');
+    const extraLove = document.getElementById('extraLove');
 
-function setInitialPosition() {
-    loveMeter.value = 100;
-    loveValue.textContent = 100;
-    loveMeter.style.width = '100%';
+    if (!loveMeter || !loveValue || !extraLove) return;
+
+    function setInitialPosition() {
+        loveMeter.value = 100;
+        loveValue.textContent = 100;
+        loveMeter.style.width = '100%';
+        extraLove.textContent = "";
+        extraLove.classList.remove('super-love');
+    }
+
+    setInitialPosition();
+
+    loveMeter.addEventListener('input', () => {
+        const value = parseInt(loveMeter.value);
+        loveValue.textContent = value;
+
+        if (value > 100) {
+            const overflowPercentage = (value - 100) / 9900;
+            const extraWidth = overflowPercentage * window.innerWidth * 0.8;
+            loveMeter.style.width = `calc(100% + ${extraWidth}px)`;
+            loveMeter.style.transition = 'width 0.3s';
+
+            if (value >= 5000) {
+                extraLove.classList.add('super-love');
+                extraLove.textContent = config.loveMessages.extreme;
+            } else if (value > 1000) {
+                extraLove.classList.remove('super-love');
+                extraLove.textContent = config.loveMessages.high;
+            } else {
+                extraLove.classList.remove('super-love');
+                extraLove.textContent = config.loveMessages.normal;
+            }
+        } else {
+            extraLove.textContent = "";
+            extraLove.classList.remove('super-love');
+            loveMeter.style.width = '100%';
+        }
+    });
 }
 
-loveMeter.addEventListener('input', () => {
-    const value = parseInt(loveMeter.value);
-    loveValue.textContent = value;
-    
-    if (value > 100) {
-        extraLove.classList.remove('hidden');
-        const overflowPercentage = (value - 100) / 9900;
-        const extraWidth = overflowPercentage * window.innerWidth * 0.8;
-        loveMeter.style.width = `calc(100% + ${extraWidth}px)`;
-        loveMeter.style.transition = 'width 0.3s';
-        
-        // Show different messages based on the value
-        if (value >= 5000) {
-            extraLove.classList.add('super-love');
-            extraLove.textContent = config.loveMessages.extreme;
-        } else if (value > 1000) {
-            extraLove.classList.remove('super-love');
-            extraLove.textContent = config.loveMessages.high;
-        } else {
-            extraLove.classList.remove('super-love');
-            extraLove.textContent = config.loveMessages.normal;
-        }
-    } else {
-        extraLove.classList.add('hidden');
-        extraLove.classList.remove('super-love');
-        loveMeter.style.width = '100%';
-    }
-});
-
-// Initialize love meter
-window.addEventListener('DOMContentLoaded', setInitialPosition);
-window.addEventListener('load', setInitialPosition);
-
-// Celebration function
+// Celebration
 function celebrate() {
     document.querySelectorAll('.question-section').forEach(q => q.classList.add('hidden'));
     const celebration = document.getElementById('celebration');
-    celebration.classList.remove('hidden');
-    
-    // Set celebration messages
-    document.getElementById('celebrationTitle').textContent = config.celebration.title;
-    document.getElementById('celebrationEmojis').textContent = config.celebration.emojis;
+    if (celebration) celebration.classList.remove('hidden');
 
-    // Soft burst of background hearts
+    const ct = document.getElementById('celebrationTitle');
+    const ce = document.getElementById('celebrationEmojis');
+
+    if (ct) ct.textContent = config.celebration.title;
+    if (ce) ce.textContent = config.celebration.emojis;
+
     burstHearts();
 }
 
@@ -307,49 +343,18 @@ function burstHearts() {
         bg.hearts.push(p);
     }
 
-    // Keep the list from growing forever
     if (bg.hearts.length > 90) {
         bg.hearts.splice(0, bg.hearts.length - 90);
     }
 }
 
-// Music Player Setup
-function setupMusicPlayer() {
-    const musicControls = document.getElementById('musicControls');
-    const musicToggle = document.getElementById('musicToggle');
-    const bgMusic = document.getElementById('bgMusic');
-    const musicSource = document.getElementById('musicSource');
+// Apology modal controls
+function openApology() {
+    const modal = document.getElementById('apologyModal');
+    if (modal) modal.classList.remove('hidden');
+}
 
-    // Only show controls if music is enabled in config
-    if (!config.music.enabled) {
-        musicControls.style.display = 'none';
-        return;
-    }
-
-    // Set music source and volume
-    musicSource.src = config.music.musicUrl;
-    bgMusic.volume = config.music.volume || 0.5;
-    bgMusic.load();
-
-    // Try autoplay if enabled
-    if (config.music.autoplay) {
-        const playPromise = bgMusic.play();
-        if (playPromise !== undefined) {
-            playPromise.catch(error => {
-                console.log("Autoplay prevented by browser");
-                musicToggle.textContent = config.music.startText;
-            });
-        }
-    }
-
-    // Toggle music on button click
-    musicToggle.addEventListener('click', () => {
-        if (bgMusic.paused) {
-            bgMusic.play();
-            musicToggle.textContent = config.music.stopText;
-        } else {
-            bgMusic.pause();
-            musicToggle.textContent = config.music.startText;
-        }
-    });
+function closeApology() {
+    const modal = document.getElementById('apologyModal');
+    if (modal) modal.classList.add('hidden');
 }
