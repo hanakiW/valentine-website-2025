@@ -1,3 +1,4 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,10 +12,8 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Floating Background Elements -->
-    <div class="floating-elements">
-        <!-- Hearts and bears will be added here by JavaScript -->
-    </div>
+    <!-- Interactive background -->
+    <canvas id="bgCanvas" aria-hidden="true"></canvas>
 
     <!-- Main Content Container -->
     <div class="container">
@@ -61,11 +60,10 @@
             <button class="cute-btn" onclick="moveButton(this)" id="noBtn3"></button>
         </div>
 
-        <!-- CUSTOMIZE: Celebration message -->
+        <!-- Celebration -->
         <div class="celebration hidden" id="celebration">
             <h2 id="celebrationTitle"></h2>
-            <p class="celebration-text" id="celebrationMessage"></p>
-            <p class="celebration-text" id="celebrationEmojis"></p>
+            <p class="celebration-emojis" id="celebrationEmojis"></p>
         </div>
     </div>
 
@@ -74,4 +72,4 @@
     <script src="theme.js"></script>
     <script src="script.js"></script>
 </body>
-</html> 
+</html>
