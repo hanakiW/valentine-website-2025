@@ -1,75 +1,88 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- CUSTOMIZE: Browser tab title -->
-    <title>Will You Be My Valentine? 💝</title>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <!-- Styles -->
-    <link rel="stylesheet" href="styles.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Will You Be My Valentine? 💝</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
-    <!-- Interactive background -->
-    <canvas id="bgCanvas" aria-hidden="true"></canvas>
+<canvas id="bgCanvas"></canvas>
 
-    <!-- Main Content Container -->
-    <div class="container">
-        <h1 id="valentineTitle"></h1>
-        
-        <!-- Music Player -->
-        <div id="musicControls" class="music-controls">
-            <button id="musicToggle" class="music-btn">🎵 Play Music</button>
-            <audio id="bgMusic" loop>
-                <source id="musicSource" type="audio/mpeg">
-                Your browser does not support the audio element.
-            </audio>
-        </div>
+<div class="container">
 
-        <!-- First Question -->
-        <div class="question-section" id="question1">
-            <h2 id="question1Text"></h2>
-            <button class="cute-btn" onclick="moveButton(this)" id="yesBtn1"></button>
-            <button class="cute-btn" onclick="moveButton(this)" id="noBtn1"></button>
-            <!-- CUSTOMIZE: Secret answer text -->
-            <div class="secret-answer">
-                <button class="cute-btn special" onclick="showNextQuestion(2)" id="secretAnswerBtn"></button>
-            </div>
-        </div>
+<h1 id="valentineTitle"></h1>
 
-        <!-- Second Question (Love Meter) -->
-        <div class="question-section hidden" id="question2">
-            <h2 id="question2Text"></h2>
-            <!-- Love meter settings: min="0" max="10000" -->
-            <div class="love-meter">
-                <input type="range" min="0" max="10000" value="100" class="slider" id="loveMeter">
-                <p>
-                    <span class="love-value-container"><span id="startText"></span> (<span id="loveValue">100</span>%)</span>
-                    <span id="extraLove" class="hidden"></span>
-                </p>
-            </div>
-            <button class="cute-btn" onclick="showNextQuestion(3)" id="nextBtn"></button>
-        </div>
+<!-- QUESTIONS -->
+<div class="question-section" id="question1">
+<h2 id="question1Text"></h2>
+<button class="cute-btn" onclick="moveButton(this)" id="yesBtn1"></button>
+<button class="cute-btn" onclick="moveButton(this)" id="noBtn1"></button>
 
-        <!-- Final Question -->
-        <div class="question-section hidden" id="question3">
-            <h2 id="question3Text"></h2>
-            <button class="cute-btn final-yes" onclick="celebrate()" id="yesBtn3"></button>
-            <button class="cute-btn" onclick="moveButton(this)" id="noBtn3"></button>
-        </div>
+<div class="secret-answer">
+<button class="cute-btn special" onclick="showNextQuestion(2)" id="secretAnswerBtn"></button>
+</div>
+</div>
 
-        <!-- Celebration -->
-        <div class="celebration hidden" id="celebration">
-            <h2 id="celebrationTitle"></h2>
-            <p class="celebration-emojis" id="celebrationEmojis"></p>
-        </div>
-    </div>
+<div class="question-section hidden" id="question2">
+<h2 id="question2Text"></h2>
 
-    <!-- Scripts -->
-    <script src="config.js"></script>
-    <script src="theme.js"></script>
-    <script src="script.js"></script>
+<div class="love-meter">
+<input type="range" min="0" max="10000" value="100" class="slider" id="loveMeter">
+<p><span id="startText"></span> (<span id="loveValue">100</span>%)</p>
+<p id="extraLove"></p>
+</div>
+
+<button class="cute-btn" onclick="showNextQuestion(3)" id="nextBtn"></button>
+</div>
+
+<div class="question-section hidden" id="question3">
+<h2 id="question3Text"></h2>
+<button class="cute-btn" onclick="celebrate()" id="yesBtn3"></button>
+<button class="cute-btn" onclick="moveButton(this)" id="noBtn3"></button>
+</div>
+
+<!-- FINAL -->
+<div class="celebration hidden" id="celebration">
+<h2 id="celebrationTitle"></h2>
+<p id="celebrationEmojis"></p>
+
+<!-- PHOTO GALLERY -->
+<div class="photo-gallery">
+<img src="images/her1.jpg">
+<img src="images/her2.jpg">
+<img src="images/her3.jpg">
+</div>
+</div>
+
+</div>
+
+<!-- APOLOGY BUTTON BELOW MAIN BOX -->
+<div class="apology-trigger" onclick="openApology()">
+HI PLEASE CLICK HERE TOO
+</div>
+
+<!-- APOLOGY MODAL -->
+<div class="apology-modal hidden" id="apologyModal">
+<div class="apology-box">
+<p>
+HEYEYYEYEYEYE BEAUUUUTIFFUUUUULLLLLLL, i’m checking in to like lowk js retract my “i’m done” statement from last night because let’s be real, i’m way too obsessed with you to ever actually leave.<br><br>
+
+i know i said i was 'done' last night, but we both know that’s the biggest lie i’ve ever told. i couldn’t be done with you if i tried. i just got in my feelings because 12 hours of being left on seen and then me sooo badly wanting to talk to you but then you sleeping ( WHICH IS ALR BTW ) had me starving for you. i’m just greedy for your time tsk tsk, what can i say?<br><br>
+
+i’m sorry for the 'done' talk and for getting mad. i just wanted those extra hours of yours before you drifted off. also, you know i only nag you about the fufu stuff because i plan on keeping you around for at least the next 135 years and i NEED those lungs healthy for all the kisses i’m finna give you.<br><br>
+
+BUT CUZ UR READING THIS THAT MEANS THAT YOU’RE MY VALENTINEEEE YAYAYAYAYA. yo nigga no refunds, no exchanges and definitely no 'No' buttons allowed. i’m ready to stop being a headache theek hai like pwomise. can we like skip the “fighting” and go back to me worshiping you? PRETTY PLEASEAESESE
+</p>
+
+<button class="cute-btn" onclick="closeApology()">close</button>
+</div>
+</div>
+
+<script src="config.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
