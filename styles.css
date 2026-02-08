@@ -66,13 +66,13 @@ body::after {
     background: rgba(255, 255, 255, 0.62);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
-    padding: 46px 38px;
+    padding: 60px 50px;
     border-radius: 28px;
     box-shadow:
         0 18px 55px rgba(0, 0, 0, 0.18),
         0 2px 0 rgba(255, 255, 255, 0.35) inset;
     text-align: center;
-    max-width: 600px;
+    max-width: 750px;
     margin: 20px;
     overflow: visible !important;
 }
@@ -114,16 +114,16 @@ body::after {
     cursor: pointer;
     transition: transform 0.3s, background 0.3s;
     box-shadow: 0 10px 26px rgba(255, 71, 87, 0.22);
-    min-width: 220px;
+    min-width: 240px;
 }
 
 .cute-btn:hover {
-    transform: scale(1.1);
+    transform: scale(1.06);
     background: var(--button-hover);
 }
 
 .cute-btn:active {
-    transform: scale(1.04);
+    transform: scale(1.03);
 }
 
 .hidden {
@@ -152,8 +152,8 @@ body::after {
 .secret-answer .cute-btn {
     font-size: 0.95rem;
     padding: 10px 14px;
-    min-width: 240px;
-    max-width: min(320px, 70vw);
+    min-width: 260px;
+    max-width: min(360px, 76vw);
     line-height: 1.15;
     white-space: normal;
     border: 1px solid rgba(255, 255, 255, 0.55);
@@ -253,22 +253,24 @@ body::after {
 
 #extraLove {
     color: #ff6b6b;
-    font-weight: bold;
-    animation: bounce 0.5s infinite alternate;
+    font-weight: 700;
+    animation: none;
     display: block;
-    padding: 5px 10px;
-    border-radius: 10px;
+    padding: 8px 12px;
+    border-radius: 12px;
     background: rgba(255, 107, 107, 0.1);
     text-shadow: 0 2px 4px rgba(255, 71, 87, 0.2);
-    transition: all 0.3s ease;
-    margin-top: 5px;
+    transition: all 0.2s ease;
+    margin-top: 10px;
+    max-width: 100%;
+    word-break: break-word;
 }
 
 #extraLove.super-love {
-    background: rgba(255, 107, 107, 0.2);
-    font-size: 1.2em;
-    padding: 8px 15px;
-    box-shadow: 0 4px 15px rgba(255, 71, 87, 0.2);
+    background: rgba(255, 107, 107, 0.16);
+    font-size: 1.05em;
+    padding: 10px 14px;
+    box-shadow: 0 4px 15px rgba(255, 71, 87, 0.16);
 }
 
 #loveValue {
@@ -284,15 +286,6 @@ body::after {
     gap: 5px;
 }
 
-@keyframes bounce {
-    from {
-        transform: scale(1);
-    }
-    to {
-        transform: scale(1.2);
-    }
-}
-
 .hearts-explosion {
     font-size: 2rem;
     animation: explode 1s ease-out forwards;
@@ -300,15 +293,9 @@ body::after {
 }
 
 @keyframes explode {
-    0% {
-        transform: scale(0);
-    }
-    50% {
-        transform: scale(var(--heart-explosion-size));
-    }
-    100% {
-        transform: scale(1);
-    }
+    0% { transform: scale(0); }
+    50% { transform: scale(var(--heart-explosion-size)); }
+    100% { transform: scale(1); }
 }
 
 h1, h2 {
@@ -327,15 +314,6 @@ h2 {
     font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     font-weight: 600;
     font-size: clamp(1.1rem, 2.2vw, 1.35rem);
-}
-
-.super-love {
-    font-size: 1.5em;
-    color: #ff4757;
-    font-weight: bold;
-    transform: scale(1.2);
-    display: inline-block;
-    text-shadow: 2px 2px 4px rgba(255, 71, 87, 0.3);
 }
 
 .celebration-emojis {
@@ -357,41 +335,100 @@ h2 {
     100% { opacity: 0.3; }
 }
 
-.music-controls {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 1000;
+/* Photo gallery */
+.photo-gallery {
+    margin-top: 18px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
-.music-btn {
-    background: rgba(255, 107, 107, 0.92);
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 20px;
+.photo-gallery img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 16px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+    transition: transform 0.25s ease;
+}
+
+.photo-gallery img:hover {
+    transform: scale(1.06);
+}
+
+/* Apology trigger below the box */
+.apology-trigger {
+    position: relative;
+    z-index: 2;
+    margin: 18px auto 26px;
+    width: fit-content;
+    max-width: 92vw;
+    padding: 12px 18px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: #ff4d6d;
+    font-weight: 700;
     cursor: pointer;
-    font-size: 16px;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    box-shadow: 0 10px 26px rgba(255, 71, 87, 0.16);
+    transition: transform 0.25s ease, background 0.25s ease;
+    text-align: center;
 }
 
-.music-btn:hover {
-    transform: scale(1.05);
-    background: rgba(255, 135, 135, 0.92);
+.apology-trigger:hover {
+    transform: scale(1.03);
+    background: rgba(255, 255, 255, 0.68);
+}
+
+/* Apology modal */
+.apology-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    background: rgba(0,0,0,0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 22px;
+}
+
+.apology-box {
+    width: min(720px, 92vw);
+    max-height: min(78vh, 700px);
+    overflow: auto;
+    background: rgba(255,255,255,0.92);
+    border-radius: 22px;
+    padding: 22px 18px;
+    box-shadow: 0 18px 55px rgba(0,0,0,0.22);
+    color: #ff4d6d;
+    text-align: center;
+    line-height: 1.65;
+    font-size: 15px;
+}
+
+.apology-box p {
+    margin: 0 0 16px;
+    white-space: pre-wrap;
 }
 
 @media (max-width: 520px) {
     .container {
-        padding: 36px 18px;
+        padding: 44px 18px;
         border-radius: 24px;
+        max-width: 92vw;
     }
     .cute-btn {
         min-width: 86vw;
         padding: 14px 18px;
     }
     .secret-answer .cute-btn {
-        min-width: 72vw;
-        max-width: 72vw;
+        min-width: 74vw;
+        max-width: 74vw;
+    }
+    .photo-gallery img {
+        width: 104px;
+        height: 104px;
     }
 }
