@@ -1,3 +1,4 @@
+// script.js
 // Initialize configuration
 const config = window.VALENTINE_CONFIG;
 
@@ -77,41 +78,141 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('yesBtn3').textContent = config.questions.third.yesBtn;
     document.getElementById('noBtn3').textContent = config.questions.third.noBtn;
 
-    // Create initial floating elements
-    createFloatingElements();
+    // Start the interactive background
+    startInteractiveBackground();
 
     // Setup music player
     setupMusicPlayer();
 });
 
-// Create floating hearts and bears
-function createFloatingElements() {
-    const container = document.querySelector('.floating-elements');
-    
-    // Create hearts
-    config.floatingEmojis.hearts.forEach(heart => {
-        const div = document.createElement('div');
-        div.className = 'heart';
-        div.innerHTML = heart;
-        setRandomPosition(div);
-        container.appendChild(div);
-    });
+// Interactive heart background
+let bg = null;
 
-    // Create bears
-    config.floatingEmojis.bears.forEach(bear => {
-        const div = document.createElement('div');
-        div.className = 'bear';
-        div.innerHTML = bear;
-        setRandomPosition(div);
-        container.appendChild(div);
-    });
+function startInteractiveBackground() {
+    const canvas = document.getElementById('bgCanvas');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d', { alpha: true });
+    const state = {
+        canvas,
+        ctx,
+        dpr: Math.max(1, Math.min(2, window.devicePixelRatio || 1)),
+        w: 0,
+        h: 0,
+        hearts: [],
+        mouse: { x: -9999, y: -9999, active: false },
+        raf: 0
+    };
+    bg = state;
+
+    const resize = () => {
+        state.w = window.innerWidth;
+        state.h = window.innerHeight;
+        canvas.width = Math.floor(state.w * state.dpr);
+        canvas.height = Math.floor(state.h * state.dpr);
+        canvas.style.width = state.w + 'px';
+        canvas.style.height = state.h + 'px';
+        ctx.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);
+    };
+
+    const onMove = (clientX, clientY) => {
+        state.mouse.x = clientX;
+        state.mouse.y = clientY;
+        state.mouse.active = true;
+    };
+
+    window.addEventListener('resize', resize);
+    window.addEventListener('mousemove', (e) => onMove(e.clientX, e.clientY), { passive: true });
+    window.addEventListener('touchmove', (e) => {
+        const t = e.touches && e.touches[0];
+        if (t) onMove(t.clientX, t.clientY);
+    }, { passive: true });
+    window.addEventListener('mouseleave', () => { state.mouse.active = false; });
+
+    resize();
+
+    const count = Math.max(28, Math.min(60, Math.floor(state.w / 22)));
+    state.hearts = Array.from({ length: count }, () => makeHeart(state.w, state.h));
+
+    const tick = () => {
+        state.raf = requestAnimationFrame(tick);
+        drawBackground(state);
+    };
+    tick();
 }
 
-// Set random position for floating elements
-function setRandomPosition(element) {
-    element.style.left = Math.random() * 100 + 'vw';
-    element.style.animationDelay = Math.random() * 5 + 's';
-    element.style.animationDuration = 10 + Math.random() * 20 + 's';
+function makeHeart(w, h) {
+    const size = 6 + Math.random() * 12;
+    return {
+        x: Math.random() * w,
+        y: Math.random() * h,
+        vx: (Math.random() - 0.5) * 0.35,
+        vy: (Math.random() - 0.5) * 0.25,
+        r: Math.random() * Math.PI * 2,
+        vr: (Math.random() - 0.5) * 0.006,
+        size,
+        alpha: 0.22 + Math.random() * 0.26
+    };
+}
+
+function drawBackground(state) {
+    const { ctx, w, h, hearts, mouse } = state;
+    ctx.clearRect(0, 0, w, h);
+
+    const repelRadius = 120;
+    const repelRadius2 = repelRadius * repelRadius;
+
+    for (const p of hearts) {
+        // Drift
+        p.x += p.vx;
+        p.y += p.vy;
+        p.r += p.vr;
+
+        // Wrap
+        if (p.x < -40) p.x = w + 40;
+        if (p.x > w + 40) p.x = -40;
+        if (p.y < -40) p.y = h + 40;
+        if (p.y > h + 40) p.y = -40;
+
+        // Mouse interaction
+        if (mouse.active) {
+            const dx = p.x - mouse.x;
+            const dy = p.y - mouse.y;
+            const d2 = dx * dx + dy * dy;
+            if (d2 < repelRadius2) {
+                const d = Math.max(1, Math.sqrt(d2));
+                const force = (repelRadius - d) / repelRadius;
+                p.x += (dx / d) * force * 6;
+                p.y += (dy / d) * force * 6;
+                p.vx += (dx / d) * force * 0.03;
+                p.vy += (dy / d) * force * 0.03;
+            }
+        }
+
+        // Soft damping
+        p.vx *= 0.995;
+        p.vy *= 0.995;
+
+        drawHeart(ctx, p.x, p.y, p.size, p.r, p.alpha);
+    }
+}
+
+function drawHeart(ctx, x, y, size, rotation, alpha) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(rotation);
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = 'rgba(255, 90, 107, 1)';
+
+    const s = size;
+    ctx.beginPath();
+    ctx.moveTo(0, s * 0.35);
+    ctx.bezierCurveTo(s * 0.6, -s * 0.2, s * 1.15, s * 0.35, 0, s);
+    ctx.bezierCurveTo(-s * 1.15, s * 0.35, -s * 0.6, -s * 0.2, 0, s * 0.35);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.restore();
 }
 
 // Function to show next question
@@ -122,8 +223,9 @@ function showNextQuestion(questionNumber) {
 
 // Function to move the "No" button when clicked
 function moveButton(button) {
-    const x = Math.random() * (window.innerWidth - button.offsetWidth);
-    const y = Math.random() * (window.innerHeight - button.offsetHeight);
+    const pad = 14;
+    const x = pad + Math.random() * (window.innerWidth - button.offsetWidth - pad * 2);
+    const y = pad + Math.random() * (window.innerHeight - button.offsetHeight - pad * 2);
     button.style.position = 'fixed';
     button.style.left = x + 'px';
     button.style.top = y + 'px';
@@ -181,22 +283,33 @@ function celebrate() {
     
     // Set celebration messages
     document.getElementById('celebrationTitle').textContent = config.celebration.title;
-    document.getElementById('celebrationMessage').textContent = config.celebration.message;
     document.getElementById('celebrationEmojis').textContent = config.celebration.emojis;
-    
-    // Create heart explosion effect
-    createHeartExplosion();
+
+    // Soft burst of background hearts
+    burstHearts();
 }
 
-// Create heart explosion animation
-function createHeartExplosion() {
-    for (let i = 0; i < 50; i++) {
-        const heart = document.createElement('div');
-        const randomHeart = config.floatingEmojis.hearts[Math.floor(Math.random() * config.floatingEmojis.hearts.length)];
-        heart.innerHTML = randomHeart;
-        heart.className = 'heart';
-        document.querySelector('.floating-elements').appendChild(heart);
-        setRandomPosition(heart);
+function burstHearts() {
+    if (!bg || !bg.hearts) return;
+    const w = bg.w;
+    const h = bg.h;
+    const cx = w * 0.5;
+    const cy = h * 0.35;
+
+    for (let i = 0; i < 26; i++) {
+        const p = makeHeart(w, h);
+        p.x = cx + (Math.random() - 0.5) * 40;
+        p.y = cy + (Math.random() - 0.5) * 40;
+        p.vx = (Math.random() - 0.5) * 3.2;
+        p.vy = (Math.random() - 0.5) * 2.6;
+        p.alpha = 0.28 + Math.random() * 0.22;
+        p.size = 10 + Math.random() * 16;
+        bg.hearts.push(p);
+    }
+
+    // Keep the list from growing forever
+    if (bg.hearts.length > 90) {
+        bg.hearts.splice(0, bg.hearts.length - 90);
     }
 }
 
@@ -239,4 +352,4 @@ function setupMusicPlayer() {
             musicToggle.textContent = config.music.startText;
         }
     });
-} 
+}
